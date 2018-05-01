@@ -13,7 +13,7 @@ class Block:
     """
     Representation of a transaction of a node
     """
-    def __init__(self,ID,value = 0, header =""):
+    def __init__(self,ID,value = 0, header ="",previous = ""):
         self.ID = ID #the incremental ID of the transaction
         self.date_created = datetime.datetime.now() #the physical time
         self.value = value #the value the node holds
@@ -71,6 +71,32 @@ class Tree:
         self.tree_parent = dict()
 
     """
+    Does an in order traversal of the tree
+    Spot needs to be the root in order to start!
+    """
+    def traverse_down(self,spot,height):
+        if self.tree_child[spot] == []:
+            print spot,height
+        else:
+            self.traverse_down(self.tree_child[spot][1],height + 1)
+            print spot,height
+            self.traverse_down(self.tree_child[spot][0],height +1)
+
+    """
+    Traverses up the tree.
+    Takes in hash of the block being checked to the top.
+    """
+    def traverse_up(self,child):
+        if(child not in self.tree_parent):
+            return False
+        elif(self.tree_parent[child] == ""):
+            return True
+        else:
+            parent = self.tree_parent[child]
+            print parent
+            return self.traverse_up(parent)
+
+    """
     Returns the amount of pairs in the bottom row.
     """
     def make_pairs_init(self):
@@ -110,10 +136,19 @@ class Tree:
         value(int): the integer value that the tree is holding
     """
     def add_transaction(self,value):
-        block = Block(self.amount,value = value)
+
+        #this adds a blockchain-isc feel to it.
+        if(len(self.history) == 0):
+            prev = ""
+        else:
+            prev = self.history[-1].get_hash()
+
+        block = Block(self.amount,value = value,previous = prev)
         self.amount +=1
         self.history.append(block)
+        self.history[-1]
         self.root = self.create_tree()
+        self.tree_parent[self.root] = ""
 
     """
     Returns the top hash of the merkle tree. Which is known as the merkle root.
@@ -160,9 +195,13 @@ class Tree:
 
             #keeps track of what the layer looks like
             new_line.append(hashed)
-
+            print "Node1:,",node1
+            print "Node2:,",node2
+            print "Hashed,",hashed
             #updates the tree
             self.tree_child[hashed] = [node1,node2]
+            self.tree_child[node1] = []
+            self.tree_child[node2] = []
             self.tree_parent[node1] = hashed
             self.tree_parent[node2] = hashed
 
@@ -190,7 +229,9 @@ class Tree:
 
             #keeps track of the keys going up the tree
             new_line.append(hashed)
-
+            print "Node1:,",node1
+            print "Node2:,",node2
+            print "Hashed,",hashed
             #updates the tree
             self.tree_child[hashed] = [node1,node2]
             self.tree_parent[node1] = hashed
@@ -202,6 +243,7 @@ class Tree:
 
         # leftover from the pairs
         if(remainder == 1):
+            self.tree_child
             new_line.append(keys[-1])
 
         return new_line
@@ -223,6 +265,9 @@ class Tree:
             node1 = keys[maximum -pair ]
             node2 = keys[maximum -(pair +1)]
             hashed = self.get_hash(node1,node2)
+            print "Node1:,",node1
+            print "Node2:,",node2
+            print "Hashed,",hashed
             #keeps track of the keys going up the tree
             new_line.append(hashed)
             self.tree_child[hashed] = [node1,node2]
@@ -236,10 +281,24 @@ class Tree:
             new_line.append(keys[0])
 
         return new_line
+
 """
 creates a tree, then adds 10 blocks to it.
 """
-T = Tree()
-for i in range(10):
-    T.add_transaction("")
-    print T.get_root()
+T1 = Tree()
+for i in range(8):
+    T1.add_transaction("")
+    print """
+
+
+
+    """
+
+
+
+print "31bca02094eb78126a517b206a88c73cfa9ec6f704c7030d18212cace820f025f00bf0ea68dbf3f3a5436ca63b53bf7bf80ad8d5de7d8359d0b7fed9dbc3ab99"
+print T1.traverse_up("31bca02094eb78126a517b206a88c73cfa9ec6f704c7030d18212cace820f025f00bf0ea68dbf3f3a5436ca63b53bf7bf80ad8d5de7d8359d0b7fed9dbc3ab99")
+def is_same_tree(t1,t2):
+    if(t1.get_root() == t2.get_root()):
+        return True
+    return False
