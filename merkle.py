@@ -282,22 +282,57 @@ class Tree:
 
         return new_line
 
+    """
+    Tests to see if the hashs from the two children match the parent
+    Args:
+        known(string): a hash of the level it's currently standing at.
+        parent(string): a hash of the parent of known
+    Returns:
+        bool: true if the hashes match, false otherwise.
+    """
+    def test_sibling(self, known, parent):
+        children = self.tree_child[parent]
+
+        if(children[0] == known):
+            child1 = known
+            child2 = children[1]
+        else:
+            child1 = children[0]
+            child2 = known
+        hashed = self.get_hash(child1,child2)
+        return hashed == parent
+
+
+    """
+    Validatest the block in the Merkle Tree
+    Args:
+        block(Block): The physical block that needs to be verified on the merkle tree.
+    Returns:
+        bool: True if the block is valid, false otherwise
+    """
+    def is_valid_block(self,block):
+        hashed = block.get_hash()
+        return self.is_valid_block_helper(hashed)
+
+    def is_valid_block_helper(self,child_known):
+        if(child_known not in self.tree_parent): # needs to be in the dictionary
+            return False
+        parent = self.tree_parent[child_known] # the parent hash
+        if(parent == ""): # root node
+            return True
+        elif(self.test_sibling(child_known,parent)):
+            return self.is_valid_block_helper(parent)
+        #the hash is wrong then false
+        else:
+            return False
+
 """
 creates a tree, then adds 10 blocks to it.
 """
 T1 = Tree()
 for i in range(8):
     T1.add_transaction("")
-    print """
 
-
-
-    """
-
-
-
-print "31bca02094eb78126a517b206a88c73cfa9ec6f704c7030d18212cace820f025f00bf0ea68dbf3f3a5436ca63b53bf7bf80ad8d5de7d8359d0b7fed9dbc3ab99"
-print T1.traverse_up("31bca02094eb78126a517b206a88c73cfa9ec6f704c7030d18212cace820f025f00bf0ea68dbf3f3a5436ca63b53bf7bf80ad8d5de7d8359d0b7fed9dbc3ab99")
 def is_same_tree(t1,t2):
     if(t1.get_root() == t2.get_root()):
         return True
