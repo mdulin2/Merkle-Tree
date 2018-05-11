@@ -19,7 +19,7 @@ class Block:
         self.value = value #the value the node holds
         self.header = header #more information about the node
         self.random_bytes = self.random_vals(5)
-        self.previous = None # need to work on this piece...
+        self.previous = previous # need to work on this piece...
 
     """
     Creates a lot of random bytes
@@ -75,6 +75,8 @@ class Tree:
     Spot needs to be the root in order to start!
     """
     def traverse_down(self,spot,height):
+        if(spot not in self.tree_child):
+            return
         if self.tree_child[spot] == []:
             print spot,height
         else:
@@ -146,7 +148,6 @@ class Tree:
         block = Block(self.amount,value = value,previous = prev)
         self.amount +=1
         self.history.append(block)
-        self.history[-1]
         self.root = self.create_tree()
         self.tree_parent[self.root] = ""
 
@@ -195,9 +196,9 @@ class Tree:
 
             #keeps track of what the layer looks like
             new_line.append(hashed)
-            print "Node1:,",node1
-            print "Node2:,",node2
-            print "Hashed,",hashed
+            # print "Node1:,",node1
+            # print "Node2:,",node2
+            # print "Hashed,",hashed
             #updates the tree
             self.tree_child[hashed] = [node1,node2]
             self.tree_child[node1] = []
@@ -229,9 +230,9 @@ class Tree:
 
             #keeps track of the keys going up the tree
             new_line.append(hashed)
-            print "Node1:,",node1
-            print "Node2:,",node2
-            print "Hashed,",hashed
+            # print "Node1:,",node1
+            # print "Node2:,",node2
+            # print "Hashed,",hashed
             #updates the tree
             self.tree_child[hashed] = [node1,node2]
             self.tree_parent[node1] = hashed
@@ -265,9 +266,9 @@ class Tree:
             node1 = keys[maximum -pair ]
             node2 = keys[maximum -(pair +1)]
             hashed = self.get_hash(node1,node2)
-            print "Node1:,",node1
-            print "Node2:,",node2
-            print "Hashed,",hashed
+            # print "Node1:,",node1
+            # print "Node2:,",node2
+            # print "Hashed,",hashed
             #keeps track of the keys going up the tree
             new_line.append(hashed)
             self.tree_child[hashed] = [node1,node2]
@@ -326,14 +327,36 @@ class Tree:
         else:
             return False
 
-"""
-creates a tree, then adds 10 blocks to it.
-"""
-T1 = Tree()
-for i in range(8):
-    T1.add_transaction("")
-
 def is_same_tree(t1,t2):
     if(t1.get_root() == t2.get_root()):
         return True
     return False
+"""
+creates a tree, then adds 9 blocks to it.
+"""
+T1 = Tree()
+for i in range(9):
+    T1.add_transaction("")
+
+T2 = Tree()
+for i in range(9):
+    T2.add_transaction("")
+
+print "Check T1 and T2"
+print "Checking branch information: ",T2.is_valid_block(T1.history[8])
+print "Checking the Merkle Roots: ",is_same_tree(T1,T2)
+
+"""
+creates a tree, then adds 10 blocks to it.
+"""
+T3 = Tree()
+for i in range(8):
+    T3.add_transaction("")
+T3.add_transaction(" ")
+
+
+print "Checks if Tree3's block 9 is the same as Tree 2's block 9:",T3.is_valid_block(T1.history[8])
+print "Checks merkle root of T2 and T3:", is_same_tree(T3,T2)
+#print "Tree 3: ", T3.root
+#print  "Tree 2: ",T2.root
+T3.traverse_down(T3.root,0)
