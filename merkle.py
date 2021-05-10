@@ -140,7 +140,7 @@ class Tree:
     def add_transaction(self,value):
 
         #this adds a blockchain-isc feel to it.
-        if(len(self.history) == 0):
+        if(self.history == 0): # Code Guru change
             prev = ""
         else:
             prev = self.history[-1].get_hash()
